@@ -3,6 +3,7 @@ package jsonHandler
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 )
 
 type testStruct struct {
@@ -17,5 +18,14 @@ func Marshal() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(string(result))
+	file, err := os.OpenFile("S:/GoProj/json.txt", os.O_WRONLY|os.O_APPEND, 0644)
+	if err != nil {
+		fmt.Println("Error trying to open file: ", err)
+		return
+	}
+	defer file.Close()
+	_, err = file.Write(result)
+	if err != nil {
+		fmt.Println("Error during writing to a file: ", err)
+	}
 }
