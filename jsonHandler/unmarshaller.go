@@ -2,16 +2,16 @@ package jsonHandler
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"os"
+	"sed/dbHandler"
+	"sed/model"
 )
 
-func Unmarshall() {
-	//result := make([]testStruct, 0)
-	result := testStruct{}
-	file, err := os.Open("S:/GoProj/json.txt")
+func Unmarshall(path string) (result []model.User, err error) {
+	result = make([]model.User, 0)
+	file, err := os.Open(path)
 	if err != nil {
-		fmt.Println("Error trying to open file: ", err)
 		return
 	}
 	defer file.Close()
@@ -19,13 +19,12 @@ func Unmarshall() {
 	input := make([]byte, fileStat.Size())
 	_, err = file.Read(input)
 	if err != nil {
-		fmt.Println("Error during reading file: ", err)
 		return
 	}
-	fmt.Println(string(input))
-	if err := json.Unmarshal(input, &result); err != nil {
-		fmt.Println(err)
-		return
+	err = json.Unmarshal(input, &result)
+	transaction := dbHandler.ConnectToDB().Create(&result)
+	if transaction.Error != nil {
+		log.Fatal(transaction.Error)
 	}
-	fmt.Println(result)
+	return
 }

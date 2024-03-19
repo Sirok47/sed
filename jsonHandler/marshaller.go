@@ -2,30 +2,36 @@ package jsonHandler
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
+	"sed/dbHandler"
+	"sed/model"
 )
 
-type testStruct struct {
-	Name string
-	Age  int
-	Male bool
-}
-
-func Marshal() {
-	result, err := json.Marshal(testStruct{Name: "sed", Age: 333, Male: false})
-	if err != nil {
-		fmt.Println(err)
+func Marshal(path string, wrMode string) (result []byte, err error) {
+	users := make([]model.User, 0)
+	query := dbHandler.ConnectToDB().Find(&users)
+	if query.Error != nil {
+		err = query.Error
 		return
 	}
-	file, err := os.OpenFile("S:/GoProj/json.txt", os.O_WRONLY|os.O_APPEND, 0644)
+	if wrMode == "append" {
+		existingJson := make([]model.User, 0)
+		existingJson, err = Unmarshall(path)
+		if err != nil {
+			return
+		}
+		result, err = json.Marshal(append(existingJson, users...))
+	} else {
+		result, err = json.Marshal(users)
+	}
 	if err != nil {
-		fmt.Println("Error trying to open file: ", err)
+		return
+	}
+	file, err := os.Create(path)
+	if err != nil {
 		return
 	}
 	defer file.Close()
 	_, err = file.Write(result)
-	if err != nil {
-		fmt.Println("Error during writing to a file: ", err)
-	}
+	return
 }

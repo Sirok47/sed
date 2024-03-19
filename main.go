@@ -1,6 +1,8 @@
 package main
 
-import "sed/cmd"
+import (
+	"sed/cmd"
+)
 
 func main() {
 	cmd.Execute()
