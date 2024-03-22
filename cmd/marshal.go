@@ -6,10 +6,8 @@ import (
 	json "sed/jsonHandler"
 )
 
-const defJsonPath = "S:/GoProj/json.txt"
-
 func init() {
-	jsonMarshal.Flags().StringVarP(&wrMode, "mode", "m", "append", "Defines write mode [append(default)|rewrite]")
+	jsonMarshal.Flags().StringVarP(&wrMode, "mode", "m", "", "Defines write mode [append|rewrite]")
 	rootCmd.AddCommand(jsonMarshal)
 }
 
@@ -17,8 +15,8 @@ var wrMode string
 
 var jsonMarshal = &cobra.Command{
 	Use:   "marshal [--mode] [path]",
-	Short: "Prints input as json",
-	Long:  "Encodes inputs as json and prints the result",
+	Short: "Prints input as json, and optionally inserts result into txt",
+	Long:  "Encodes data from DB as json and prints the result, using tag --mode you can print json to text file",
 	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		var path string

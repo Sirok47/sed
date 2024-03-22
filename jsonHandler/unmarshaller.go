@@ -8,7 +8,7 @@ import (
 	"sed/model"
 )
 
-func Unmarshall(path string) (result []model.User, err error) {
+func Unmarshall(path string, stamp bool) (result []model.User, err error) {
 	result = make([]model.User, 0)
 	file, err := os.Open(path)
 	if err != nil {
@@ -22,9 +22,14 @@ func Unmarshall(path string) (result []model.User, err error) {
 		return
 	}
 	err = json.Unmarshal(input, &result)
-	transaction := dbHandler.ConnectToDB().Create(&result)
-	if transaction.Error != nil {
-		log.Fatal(transaction.Error)
+	if err != nil {
+		return
+	}
+	if stamp {
+		transaction := dbHandler.ConnectToDB().Create(&result)
+		if transaction.Error != nil {
+			log.Fatal(transaction.Error)
+		}
 	}
 	return
 }
