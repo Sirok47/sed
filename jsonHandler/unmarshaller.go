@@ -1,15 +1,11 @@
 package jsonHandler
 
 import (
-	"encoding/json"
 	"log"
 	"os"
-	"sed/dbHandler"
-	"sed/model"
 )
 
-func Unmarshall(path string, stamp bool) (result []model.User, err error) {
-	result = make([]model.User, 0)
+func Unmarshal(object *JSONable, path string, stamp bool) (err error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return
@@ -21,15 +17,19 @@ func Unmarshall(path string, stamp bool) (result []model.User, err error) {
 	if err != nil {
 		return
 	}
-	err = json.Unmarshal(input, &result)
+
+	err = (*object).ConsumeJSON(input)
 	if err != nil {
 		return
 	}
-	if stamp {
-		transaction := dbHandler.ConnectToDB().Create(&result)
-		if transaction.Error != nil {
-			log.Fatal(transaction.Error)
-		}
+	if !stamp {
+		return
 	}
+
+	transaction := (*object).SendToDB()
+	if transaction.Error != nil {
+		log.Fatal(transaction.Error)
+	}
+
 	return
 }

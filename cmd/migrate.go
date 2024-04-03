@@ -17,8 +17,8 @@ var migrateSchemas = &cobra.Command{
 	Long:  "Creates all absent tables in database",
 	Run: func(cmd *cobra.Command, args []string) {
 		db := dbHandler.ConnectToDB()
-		if err := db.AutoMigrate(&model.User{}); err != nil {
-			log.Println("Error while migrating &User: ", err)
+		if err := db.AutoMigrate(&model.User{}, &model.CreditCard{}); err != nil {
+			log.Println("Error while migrating schemas: ", err)
 		}
 	},
 }

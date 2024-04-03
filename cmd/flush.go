@@ -16,8 +16,8 @@ var deleteAll = &cobra.Command{
 	Long:  "Deletes all(!) entries of current table",
 	Run: func(cmd *cobra.Command, args []string) {
 		db := dbHandler.ConnectToDB()
-		if err := db.Exec("DELETE FROM users"); err != nil {
-			log.Println("Error while flushing: ", err)
+		if result := db.Exec("DELETE FROM users"); result.Error != nil {
+			log.Println("Error while flushing: ", result.Error)
 		}
 	},
 }

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"os"
-	"sed/dbHandler"
 	"sed/model"
 )
 
@@ -20,27 +19,29 @@ func fileWrite(path string, value []byte) {
 	}
 }
 
-func Marshal(path string, wrMode string) (result []byte, err error) {
-	users := make([]model.User, 0)
-	query := dbHandler.ConnectToDB().Select("name", "age", "male").Find(&users)
+func Marshal(object *JSONable, path string, wrMode string) (result []byte, err error) {
+	query := (*object).RetrieveFromDB()
 	if query.Error != nil {
 		err = query.Error
 		return
 	}
 	if wrMode == "append" {
-		existingJson := make([]model.User, 0)
-		existingJson, err = Unmarshall(path, false)
+		var existingJson JSONable
+		switch (*object).(type) {
+		case *model.Users:
+			existingJson = &model.Users{}
+		case *model.CreditCards:
+			existingJson = &model.CreditCards{}
+		}
+		err = Unmarshal(&existingJson, path, false)
 		if err != nil {
 			return
 		}
-		result, err = json.Marshal(append(existingJson, users...))
+		result, err = json.Marshal(append(existingJson.GetValue(), (*object).GetValue()...)) //переделать без передачи интерфейсов
 		fileWrite(path, result)
 	} else if wrMode == "rewrite" {
-		result, err = json.Marshal(users)
+		result, err = json.Marshal((*object).GetValue())
 		fileWrite(path, result)
-	}
-	if err != nil {
-		return
 	}
 	return
 }
