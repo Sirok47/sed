@@ -42,6 +42,8 @@ func Marshal(object *JSONable, path string, wrMode string) (result []byte, err e
 	} else if wrMode == "rewrite" {
 		result, err = json.Marshal((*object).GetValue())
 		fileWrite(path, result)
+	} else {
+		result, err = json.Marshal((*object).GetValue())
 	}
 	return
 }

@@ -9,9 +9,6 @@ import (
 	"gorm.io/gorm"
 )
 
-//создать интерфейсы вместо пустых интерфейсов
-//у весь моделей должны быть методы для распаковки json`ов
-
 type User struct {
 	ID         uint      `gorm:"primarykey" json:",omitempty"`
 	CreatedAt  time.Time `json:"-"`
@@ -57,7 +54,7 @@ func (u *Users) WrapJSON() ([]byte, error) {
 }
 
 func (u *Users) SendToDB() *gorm.DB {
-	return db.ConnectToDB().Create(&u.user)
+	return db.ConnectToDB().Omit("id", "created_at", "updated_at").Create(&u.user)
 }
 
 func (u *Users) RetrieveFromDB() *gorm.DB {
